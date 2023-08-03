@@ -55,8 +55,10 @@ public class ParkingService {
 							"Heureux de vous revoir ! En tant qu’utilisateur régulier de notre parking, vous allez obtenir une remise de 5%");
 				}
 				System.out.println("Generated Ticket and saved in DB");
-				System.out.println("Please park your vehicle in spot number:" + parkingSpot.getId());
-				System.out.println("Recorded in-time for vehicle number:" + vehicleRegNumber + " is:" + inTime);
+				System.out.println("Please park your vehicle in spot number:" +
+						parkingSpot.getId());
+				System.out.println("Recorded in-time for vehicle number:" + vehicleRegNumber
+						+ " is:" + inTime);
 			}
 		} catch (Exception e) {
 			logger.error("Unable to process incoming vehicle", e);
@@ -112,6 +114,7 @@ public class ParkingService {
 			Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
 			Date outTime = new Date();
 			ticket.setOutTime(outTime);
+			System.out.println(outTime);
 			int nbTicket = ticketDAO.getNbTicket(vehicleRegNumber);
 
 			// If this is not the first time that this user uses the car park, he will pay a
