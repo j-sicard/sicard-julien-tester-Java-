@@ -89,7 +89,7 @@ public class ParkingDataBaseIT {
 		ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 		parkingService.processExitingVehicle();
 
-		// TODO: check that the fare generated and out time are populated correctly
+		// check that the fare generated and out time are populated correctly
 		// in
 		// the database
 		Ticket ticket = ticketDAO.getTicket("ABCDEF");
@@ -116,12 +116,12 @@ public class ParkingDataBaseIT {
 
 		parkingService.processIncomingVehicle();
 		Ticket newTimeIn = ticketDAO.getTicket("GHIJKL");
-		newTimeIn.setPrice(5);
-		newTimeIn.setInTime(new Date(System.currentTimeMillis() - (45 * 60 * 1000)));
+		newTimeIn.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
 		ticketDAO.UpdateInTime(newTimeIn);
 		parkingService.processExitingVehicle();
 		Ticket ticket = ticketDAO.getTicket("GHIJKL");
-		assertTrue(ticket.getPrice() == 1.125);
+		assertTrue(ticket.getPrice() == (1.5 * 0.95));
+		assertTrue(ticketDAO.getNbTicket("GHIJKL") > 0);
 	}
 
 }

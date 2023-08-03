@@ -119,11 +119,12 @@ public class ParkingService {
 
 			// If this is not the first time that this user uses the car park, he will pay a
 			// 5% discount.
-			if (nbTicket < 1) {
-				fareCalculatorService.calculateFareTrue(ticket);
+			if (nbTicket > 1) {
+				fareCalculatorService.calculateFare(ticket, true);
+				// fareCalculatorService.calculateFareTrue(ticket);
 				// Otherwise he will pay the normal rate.
 			} else {
-				fareCalculatorService.calculateFare(ticket);
+				fareCalculatorService.calculateFare(ticket, false);
 			}
 
 			if (ticketDAO.updateTicket(ticket)) {
