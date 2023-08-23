@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>ParkingDataBaseIT.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">sicard-julien-tester-Java- (21 août 2023 18:41:55)</a> &gt; <a href="../../index.html" class="el_group">sicard-julien-tester-Java-</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.parkit.parkingsystem.integration</a> &gt; <span class="el_source">ParkingDataBaseIT.java</span></div><h1>ParkingDataBaseIT.java</h1><pre class="source lang-java linenums">package com.parkit.parkingsystem.integration;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+
+import java.util.Date;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.parkit.parkingsystem.constants.ParkingType;
+import com.parkit.parkingsystem.dao.ParkingSpotDAO;
+import com.parkit.parkingsystem.dao.TicketDAO;
+import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
+import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
+import com.parkit.parkingsystem.model.ParkingSpot;
+import com.parkit.parkingsystem.model.Ticket;
+import com.parkit.parkingsystem.service.ParkingService;
+import com.parkit.parkingsystem.util.InputReaderUtil;
+
+@ExtendWith(MockitoExtension.class)
+
+<span class="fc" id="L29">public class ParkingDataBaseIT {</span>
+
+<span class="fc" id="L31">	private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();</span>
+	private static ParkingSpotDAO parkingSpotDAO;
+	private static TicketDAO ticketDAO;
+	private static DataBasePrepareService dataBasePrepareService;
+
+	@Mock
+	private static InputReaderUtil inputReaderUtil;
+
+	@BeforeAll
+	private static void setUp() throws Exception {
+<span class="fc" id="L41">		parkingSpotDAO = new ParkingSpotDAO();</span>
+<span class="fc" id="L42">		parkingSpotDAO.dataBaseConfig = dataBaseTestConfig;</span>
+<span class="fc" id="L43">		ticketDAO = new TicketDAO();</span>
+<span class="fc" id="L44">		ticketDAO.dataBaseConfig = dataBaseTestConfig;</span>
+<span class="fc" id="L45">		dataBasePrepareService = new DataBasePrepareService();</span>
+<span class="fc" id="L46">	}</span>
+
+	@BeforeEach
+	private void setUpPerTest() throws Exception {
+
+<span class="fc" id="L51">		dataBasePrepareService.clearDataBaseEntries();</span>
+
+<span class="fc" id="L53">	}</span>
+
+	@AfterAll
+	private static void tearDown() {
+
+<span class="fc" id="L58">	}</span>
+
+	@Test
+	public void testParkingACar() throws Exception {
+<span class="fc" id="L62">		when(inputReaderUtil.readSelection()).thenReturn(1);</span>
+<span class="fc" id="L63">		when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(&quot;ABCDEF&quot;);</span>
+<span class="fc" id="L64">		ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);</span>
+
+<span class="fc" id="L66">		parkingService.processIncomingVehicle();</span>
+		// check that a ticket is actualy saved in DB and Parking table is updated
+		// with availability
+
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">		assertTrue(ticketDAO.getNbTicket(&quot;ABCDEF&quot;) &gt; 0);</span>
+<span class="fc" id="L71">		Ticket ticket = ticketDAO.getTicket(&quot;ABCDEF&quot;);</span>
+<span class="fc" id="L72">		assertFalse(ticket.getParkingSpot().isAvailable());</span>
+
+<span class="fc" id="L74">	}</span>
+
+	@Test
+	public void testParkingLotExit() throws Exception {
+		// testParkingACar();
+
+<span class="fc" id="L80">		when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(&quot;ABCDEF&quot;);</span>
+<span class="fc" id="L81">		ParkingSpot parkingSpot = new ParkingSpot(2, ParkingType.CAR, false);</span>
+<span class="fc" id="L82">		Ticket ticketToValidate = new Ticket();</span>
+<span class="fc" id="L83">		ticketToValidate.setParkingSpot(parkingSpot);</span>
+<span class="fc" id="L84">		ticketToValidate.setVehicleRegNumber(&quot;ABCDEF&quot;);</span>
+<span class="fc" id="L85">		ticketToValidate.setPrice(0);</span>
+<span class="fc" id="L86">		ticketToValidate.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));</span>
+<span class="fc" id="L87">		ticketToValidate.setOutTime(null);</span>
+<span class="fc" id="L88">		ticketDAO.saveTicket(ticketToValidate);</span>
+<span class="fc" id="L89">		ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);</span>
+<span class="fc" id="L90">		parkingService.processExitingVehicle();</span>
+
+		// check that the fare generated and out time are populated correctly
+		// in
+		// the database
+<span class="fc" id="L95">		Ticket ticket = ticketDAO.getTicket(&quot;ABCDEF&quot;);</span>
+
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">		assertTrue(ticket.getOutTime() != null);</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">		assertTrue(ticket.getPrice() == 1.5);</span>
+<span class="fc" id="L99">	}</span>
+
+	@Test
+	public void testParkingLotExitRecurringUser() throws Exception {
+
+<span class="fc" id="L104">		ParkingSpot parkingSpot = new ParkingSpot(2, ParkingType.CAR, false);</span>
+<span class="fc" id="L105">		Ticket FirstTicketValidate = new Ticket();</span>
+<span class="fc" id="L106">		FirstTicketValidate.setParkingSpot(parkingSpot);</span>
+<span class="fc" id="L107">		FirstTicketValidate.setVehicleRegNumber(&quot;GHIJKL&quot;);</span>
+<span class="fc" id="L108">		FirstTicketValidate.setPrice(0);</span>
+<span class="fc" id="L109">		FirstTicketValidate.setInTime(new Date(System.currentTimeMillis() - (120 * 60 * 1000)));</span>
+<span class="fc" id="L110">		FirstTicketValidate.setOutTime(new Date(System.currentTimeMillis() - (105 * 60 * 1000)));</span>
+<span class="fc" id="L111">		ticketDAO.saveTicket(FirstTicketValidate);</span>
+
+<span class="fc" id="L113">		when(inputReaderUtil.readSelection()).thenReturn(1);</span>
+<span class="fc" id="L114">		when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn(&quot;GHIJKL&quot;);</span>
+<span class="fc" id="L115">		ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);</span>
+
+<span class="fc" id="L117">		parkingService.processIncomingVehicle();</span>
+<span class="fc" id="L118">		Ticket newTimeIn = ticketDAO.getTicket(&quot;GHIJKL&quot;);</span>
+<span class="fc" id="L119">		newTimeIn.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));</span>
+<span class="fc" id="L120">		ticketDAO.UpdateInTime(newTimeIn);</span>
+<span class="fc" id="L121">		parkingService.processExitingVehicle();</span>
+<span class="fc" id="L122">		Ticket ticket = ticketDAO.getTicket(&quot;GHIJKL&quot;);</span>
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">		assertTrue(ticket.getPrice() == (1.5 * 0.95));</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">		assertTrue(ticketDAO.getNbTicket(&quot;GHIJKL&quot;) &gt; 0);</span>
+<span class="fc" id="L125">	}</span>
+
+	@Test
+	public void testGetNBTiket() {
+<span class="fc" id="L129">		ParkingSpot parkingSpot = new ParkingSpot(2, ParkingType.CAR, false);</span>
+<span class="fc" id="L130">		Ticket FirstTicketValidate = new Ticket();</span>
+<span class="fc" id="L131">		FirstTicketValidate.setParkingSpot(parkingSpot);</span>
+<span class="fc" id="L132">		FirstTicketValidate.setVehicleRegNumber(&quot;GHIJKL&quot;);</span>
+<span class="fc" id="L133">		FirstTicketValidate.setPrice(0);</span>
+<span class="fc" id="L134">		FirstTicketValidate.setInTime(new Date(System.currentTimeMillis() - (120 * 60 * 1000)));</span>
+<span class="fc" id="L135">		FirstTicketValidate.setOutTime(new Date(System.currentTimeMillis() - (105 * 60 * 1000)));</span>
+<span class="fc" id="L136">		ticketDAO.saveTicket(FirstTicketValidate);</span>
+
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">		assertTrue(ticketDAO.getNbTicket(&quot;GHIJKL&quot;) == 1);</span>
+
+<span class="fc" id="L140">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span>sicard-julien-tester-Java- (21 août 2023 18:41:55)</div></body></html>

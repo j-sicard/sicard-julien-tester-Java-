@@ -124,4 +124,19 @@ public class ParkingDataBaseIT {
 		assertTrue(ticketDAO.getNbTicket("GHIJKL") > 0);
 	}
 
+	@Test
+	public void testGetNBTiket() {
+		ParkingSpot parkingSpot = new ParkingSpot(2, ParkingType.CAR, false);
+		Ticket FirstTicketValidate = new Ticket();
+		FirstTicketValidate.setParkingSpot(parkingSpot);
+		FirstTicketValidate.setVehicleRegNumber("GHIJKL");
+		FirstTicketValidate.setPrice(0);
+		FirstTicketValidate.setInTime(new Date(System.currentTimeMillis() - (120 * 60 * 1000)));
+		FirstTicketValidate.setOutTime(new Date(System.currentTimeMillis() - (105 * 60 * 1000)));
+		ticketDAO.saveTicket(FirstTicketValidate);
+
+		assertTrue(ticketDAO.getNbTicket("GHIJKL") == 1);
+
+	}
+
 }

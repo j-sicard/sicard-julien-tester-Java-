@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../jacoco-resources/report.gif" type="image/gif"/><title>FareCalculatorServiceTest.java</title><link rel="stylesheet" href="../../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">sicard-julien-tester-Java- (21 août 2023 18:41:55)</a> &gt; <a href="../../index.html" class="el_group">sicard-julien-tester-Java-</a> &gt; <a href="../index.html" class="el_bundle">src/test/java</a> &gt; <a href="index.source.html" class="el_package">com.parkit.parkingsystem</a> &gt; <span class="el_source">FareCalculatorServiceTest.java</span></div><h1>FareCalculatorServiceTest.java</h1><pre class="source lang-java linenums">package com.parkit.parkingsystem;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.Date;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import com.parkit.parkingsystem.constants.Fare;
+import com.parkit.parkingsystem.constants.ParkingType;
+import com.parkit.parkingsystem.model.ParkingSpot;
+import com.parkit.parkingsystem.model.Ticket;
+import com.parkit.parkingsystem.service.FareCalculatorService;
+
+<span class="fc" id="L18">public class FareCalculatorServiceTest {</span>
+
+	private static FareCalculatorService fareCalculatorService;
+	private Ticket ticket;
+
+	@BeforeAll
+	private static void setUp() {
+<span class="fc" id="L25">		fareCalculatorService = new FareCalculatorService();</span>
+<span class="fc" id="L26">	}</span>
+
+	@BeforeEach
+	private void setUpPerTest() {
+<span class="fc" id="L30">		ticket = new Ticket();</span>
+<span class="fc" id="L31">	}</span>
+
+	@Test
+	public void calculateFareCar() {
+<span class="fc" id="L35">		Date inTime = new Date();</span>
+<span class="fc" id="L36">		inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));</span>
+<span class="fc" id="L37">		Date outTime = new Date();</span>
+<span class="fc" id="L38">		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);</span>
+
+<span class="fc" id="L40">		ticket.setInTime(inTime);</span>
+<span class="fc" id="L41">		ticket.setOutTime(outTime);</span>
+<span class="fc" id="L42">		ticket.setParkingSpot(parkingSpot);</span>
+<span class="fc" id="L43">		fareCalculatorService.calculateFare(ticket);</span>
+<span class="fc" id="L44">		assertEquals(ticket.getPrice(), Fare.CAR_RATE_PER_HOUR);</span>
+<span class="fc" id="L45">	}</span>
+
+	@Test
+	public void calculateFareBike() {
+<span class="fc" id="L49">		Date inTime = new Date();</span>
+<span class="fc" id="L50">		inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));</span>
+<span class="fc" id="L51">		Date outTime = new Date();</span>
+<span class="fc" id="L52">		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);</span>
+
+<span class="fc" id="L54">		ticket.setInTime(inTime);</span>
+<span class="fc" id="L55">		ticket.setOutTime(outTime);</span>
+<span class="fc" id="L56">		ticket.setParkingSpot(parkingSpot);</span>
+<span class="fc" id="L57">		fareCalculatorService.calculateFare(ticket);</span>
+<span class="fc" id="L58">		assertEquals(ticket.getPrice(), Fare.BIKE_RATE_PER_HOUR);</span>
+<span class="fc" id="L59">	}</span>
+
+	@Test
+	public void calculateFareUnkownType() {
+<span class="fc" id="L63">		Date inTime = new Date();</span>
+<span class="fc" id="L64">		inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000));</span>
+<span class="fc" id="L65">		Date outTime = new Date();</span>
+<span class="fc" id="L66">		ParkingSpot parkingSpot = new ParkingSpot(1, null, false);</span>
+
+<span class="fc" id="L68">		ticket.setInTime(inTime);</span>
+<span class="fc" id="L69">		ticket.setOutTime(outTime);</span>
+<span class="fc" id="L70">		ticket.setParkingSpot(parkingSpot);</span>
+<span class="pc" id="L71">		assertThrows(NullPointerException.class, () -&gt; fareCalculatorService.calculateFare(ticket, false));</span>
+<span class="fc" id="L72">	}</span>
+
+	@Test
+	public void calculateFareCarWithFutureInTime() {
+<span class="fc" id="L76">		Date inTime = new Date();</span>
+<span class="fc" id="L77">		inTime.setTime(System.currentTimeMillis() + (60 * 60 * 1000));</span>
+<span class="fc" id="L78">		Date outTime = new Date();</span>
+<span class="fc" id="L79">		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);</span>
+
+<span class="fc" id="L81">		ticket.setInTime(inTime);</span>
+<span class="fc" id="L82">		ticket.setOutTime(outTime);</span>
+<span class="fc" id="L83">		ticket.setParkingSpot(parkingSpot);</span>
+<span class="pc" id="L84">		assertThrows(IllegalArgumentException.class, () -&gt; fareCalculatorService.calculateFare(ticket));</span>
+<span class="fc" id="L85">	}</span>
+
+	@Test
+	public void calculateFareBikeWithFutureInTime() {
+<span class="fc" id="L89">		Date inTime = new Date();</span>
+<span class="fc" id="L90">		inTime.setTime(System.currentTimeMillis() + (60 * 60 * 1000));</span>
+<span class="fc" id="L91">		Date outTime = new Date();</span>
+<span class="fc" id="L92">		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);</span>
+
+<span class="fc" id="L94">		ticket.setInTime(inTime);</span>
+<span class="fc" id="L95">		ticket.setOutTime(outTime);</span>
+<span class="fc" id="L96">		ticket.setParkingSpot(parkingSpot);</span>
+<span class="pc" id="L97">		assertThrows(IllegalArgumentException.class, () -&gt; fareCalculatorService.calculateFare(ticket));</span>
+<span class="fc" id="L98">	}</span>
+
+	@Test
+	public void calculateFareBikeWithLessThanOneHourParkingTime() {
+<span class="fc" id="L102">		Date inTime = new Date();</span>
+<span class="fc" id="L103">		inTime.setTime(System.currentTimeMillis() - (45 * 60 * 1000));// 45 minutes parking time should give 3/4th</span>
+																		// parking fare
+<span class="fc" id="L105">		Date outTime = new Date();</span>
+<span class="fc" id="L106">		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);</span>
+
+<span class="fc" id="L108">		ticket.setInTime(inTime);</span>
+<span class="fc" id="L109">		ticket.setOutTime(outTime);</span>
+<span class="fc" id="L110">		ticket.setParkingSpot(parkingSpot);</span>
+<span class="fc" id="L111">		fareCalculatorService.calculateFare(ticket);</span>
+<span class="fc" id="L112">		assertEquals((0.75 * Fare.BIKE_RATE_PER_HOUR), ticket.getPrice());</span>
+<span class="fc" id="L113">	}</span>
+
+	@Test
+	public void calculateFareCarWithLessThanOneHourParkingTime() {
+<span class="fc" id="L117">		Date inTime = new Date();</span>
+<span class="fc" id="L118">		inTime.setTime(System.currentTimeMillis() - (45 * 60 * 1000));// 45 minutes parking time should give 3/4th</span>
+																		// parking fare
+<span class="fc" id="L120">		Date outTime = new Date();</span>
+<span class="fc" id="L121">		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);</span>
+
+<span class="fc" id="L123">		ticket.setInTime(inTime);</span>
+<span class="fc" id="L124">		ticket.setOutTime(outTime);</span>
+<span class="fc" id="L125">		ticket.setParkingSpot(parkingSpot);</span>
+<span class="fc" id="L126">		fareCalculatorService.calculateFare(ticket);</span>
+<span class="fc" id="L127">		assertEquals((0.75 * Fare.CAR_RATE_PER_HOUR), ticket.getPrice());</span>
+<span class="fc" id="L128">	}</span>
+
+	@Test
+	public void calculateFareCarWithMoreThanADayParkingTime() {
+<span class="fc" id="L132">		Date inTime = new Date();</span>
+<span class="fc" id="L133">		inTime.setTime(System.currentTimeMillis() - (24 * 60 * 60 * 1000));// 24 hours parking time should give 24 *</span>
+																			// parking fare per hour
+<span class="fc" id="L135">		Date outTime = new Date();</span>
+<span class="fc" id="L136">		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);</span>
+
+<span class="fc" id="L138">		ticket.setInTime(inTime);</span>
+<span class="fc" id="L139">		ticket.setOutTime(outTime);</span>
+<span class="fc" id="L140">		ticket.setParkingSpot(parkingSpot);</span>
+<span class="fc" id="L141">		fareCalculatorService.calculateFare(ticket);</span>
+<span class="fc" id="L142">		assertEquals((24 * Fare.CAR_RATE_PER_HOUR), ticket.getPrice());</span>
+<span class="fc" id="L143">	}</span>
+
+	@Test
+	public void calculateFareBikeWithMoreThanADayParkingTime() {
+<span class="fc" id="L147">		Date inTime = new Date();</span>
+<span class="fc" id="L148">		inTime.setTime(System.currentTimeMillis() - (24 * 60 * 60 * 1000));// 24 hours parking time should give 24 *</span>
+																			// parking fare per hour
+<span class="fc" id="L150">		Date outTime = new Date();</span>
+<span class="fc" id="L151">		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);</span>
+
+<span class="fc" id="L153">		ticket.setInTime(inTime);</span>
+<span class="fc" id="L154">		ticket.setOutTime(outTime);</span>
+<span class="fc" id="L155">		ticket.setParkingSpot(parkingSpot);</span>
+<span class="fc" id="L156">		fareCalculatorService.calculateFare(ticket);</span>
+<span class="fc" id="L157">		assertEquals((24 * Fare.BIKE_RATE_PER_HOUR), ticket.getPrice());</span>
+<span class="fc" id="L158">	}</span>
+
+	@Test
+	public void calculateFareCarWithLessThan30minutesParkingTime() {
+<span class="fc" id="L162">		Date inTime = new Date();</span>
+<span class="fc" id="L163">		inTime.setTime(System.currentTimeMillis() - (30 * 60 * 1000));// If the parking time is less than 30 minutes.</span>
+<span class="fc" id="L164">		Date outTime = new Date();</span>
+<span class="fc" id="L165">		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false); // That the user owns a CAR.</span>
+
+<span class="fc" id="L167">		ticket.setInTime(inTime);</span>
+<span class="fc" id="L168">		ticket.setOutTime(outTime);</span>
+<span class="fc" id="L169">		ticket.setParkingSpot(parkingSpot);</span>
+<span class="fc" id="L170">		fareCalculatorService.calculateFare(ticket);</span>
+
+<span class="fc" id="L172">		assertEquals((0 * Fare.CAR_RATE_PER_HOUR), ticket.getPrice()); // Then the price must be free.</span>
+<span class="fc" id="L173">	}</span>
+
+	@Test
+	public void calculateFareBikeWithLessThan30minutesParkingTime() {
+<span class="fc" id="L177">		Date inTime = new Date();</span>
+<span class="fc" id="L178">		inTime.setTime(System.currentTimeMillis() - (30 * 60 * 1000));// If the parking time is less than 30 minutes.</span>
+<span class="fc" id="L179">		Date outTime = new Date();</span>
+<span class="fc" id="L180">		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);// That the user owns a BIKE.</span>
+
+<span class="fc" id="L182">		ticket.setInTime(inTime);</span>
+<span class="fc" id="L183">		ticket.setOutTime(outTime);</span>
+<span class="fc" id="L184">		ticket.setParkingSpot(parkingSpot);</span>
+<span class="fc" id="L185">		fareCalculatorService.calculateFare(ticket);</span>
+
+<span class="fc" id="L187">		assertEquals((0 * Fare.BIKE_RATE_PER_HOUR), ticket.getPrice());// Then the price must be free.</span>
+<span class="fc" id="L188">	}</span>
+
+	@Test
+	public void calculateFareCarWithDiscount() {
+<span class="fc" id="L192">		Date inTime = new Date();</span>
+<span class="fc" id="L193">		inTime.setTime(System.currentTimeMillis() - (45 * 60 * 1000)); // If the user parks for more than 30 minutes.</span>
+<span class="fc" id="L194">		Date outTime = new Date();</span>
+<span class="fc" id="L195">		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false); // That the user owns a CAR.</span>
+
+<span class="fc" id="L197">		ticket.setInTime(inTime);</span>
+<span class="fc" id="L198">		ticket.setOutTime(outTime);</span>
+<span class="fc" id="L199">		ticket.setParkingSpot(parkingSpot);</span>
+<span class="fc" id="L200">		fareCalculatorService.calculateFare(ticket, true); // That he has a discount ticket.</span>
+
+<span class="fc" id="L202">		assertEquals((0.75 * Fare.CAR_RATE_PER_HOUR) * 0.95, ticket.getPrice()); // Then he must benefit from a</span>
+																					// reduction of 5%.
+<span class="fc" id="L204">	}</span>
+
+	@Test
+	public void calculateFareBikeWithDiscount() {
+<span class="fc" id="L208">		Date inTime = new Date();</span>
+<span class="fc" id="L209">		inTime.setTime(System.currentTimeMillis() - (45 * 60 * 1000)); // If the user parks for more than 30 minutes.</span>
+<span class="fc" id="L210">		Date outTime = new Date();</span>
+<span class="fc" id="L211">		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false); // That the user owns a BIKE.</span>
+
+<span class="fc" id="L213">		ticket.setInTime(inTime);</span>
+<span class="fc" id="L214">		ticket.setOutTime(outTime);</span>
+<span class="fc" id="L215">		ticket.setParkingSpot(parkingSpot);</span>
+<span class="fc" id="L216">		fareCalculatorService.calculateFare(ticket, true); // That he has a discount ticket.</span>
+
+<span class="fc" id="L218">		assertEquals((0.75 * Fare.BIKE_RATE_PER_HOUR) * 0.95, ticket.getPrice()); // Then he must benefit from a</span>
+																					// reduction of 5%.
+<span class="fc" id="L220">	}</span>
+
+	@Test
+	public void testFareForBike() {
+<span class="fc" id="L224">		assertEquals(Fare.BIKE_RATE_PER_HOUR, 1.0);</span>
+<span class="fc" id="L225">	}</span>
+
+	@Test
+	public void testFareForCar() {
+<span class="fc" id="L229">		assertEquals(Fare.CAR_RATE_PER_HOUR, 1.5);</span>
+<span class="fc" id="L230">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span>sicard-julien-tester-Java- (21 août 2023 18:41:55)</div></body></html>
